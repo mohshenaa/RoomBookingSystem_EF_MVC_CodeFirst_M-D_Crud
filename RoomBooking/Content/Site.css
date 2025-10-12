@@ -1,0 +1,126 @@
+﻿/* Set padding to keep content from hitting the edges */
+/*.body-content {
+    margin-top: 15px;
+    padding-left: 15px;
+    padding-right: 15px;
+}*/
+
+/* Override the default bootstrap behavior where horizontal description lists 
+   will truncate terms that are too long to fit in the left column 
+*/
+.dl-horizontal dt {
+    white-space: normal;
+}
+
+/* Set width on the form input elements since they're 100% wide by default */
+input,
+select,
+textarea {
+    max-width: 280px;
+}
+
+
+body {
+  background-color:lightcyan;
+    font-family: sans-serif;
+  /*  padding: 20px;*/
+}
+
+.individual-button-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    align-items: center;
+   justify-content:center;
+}
+
+.button-wrapper {
+    padding: 1.5px;
+    border-radius: 8px;
+    background: linear-gradient(45deg, #4facfe, #00f2fe);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    display: inline-block;
+    
+}
+/* Base styles for all links */
+.btn-link {
+    display: block;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    padding: 10px 15px;
+    background-color: #fff;
+    border-radius: 6px;
+    transition: background-color 0.3s ease;
+}
+.table {
+    --bs-table-bg:skyblue !important;
+
+}
+.btn-link.edit {
+    color: #4facfe;
+}
+
+.btn-link.details {
+    color: #6c757d;
+}
+
+.btn-link.delete {
+    color: #dc3545;
+}
+
+/* Hover effects */
+.btn-link:hover {
+    background-color: rgba(0, 0, 0, 0.05);
+}
+
+.btn-link.delete:hover {
+    background-color: rgba(220, 53, 69, 0.1);
+}
+
+.navbar-dark{
+    color:white;
+    font-weight:bolder
+}
+.meem:hover {
+   
+    transform: scale(1.10);
+    cursor: grab;
+}
+table {
+    width: 100%;
+    border-collapse: collapse;
+    /*background-color: lightskyblue;*/
+    margin-top: 20px;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+}
+
+th, td {
+    padding: 12px 16px;
+    border-bottom: 1px solid #eaeaea;
+    text-align: left;
+    vertical-align: top;
+}
+th {
+    background-color: #f1f4f9;
+    color: #333;
+    font-weight: bold;
+}
+
+table tr {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    transform-origin: left center; /* scale from left */
+}
+
+    table tr:hover {
+        background-color: lightskyblue;
+        transform: scale(1.01);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        z-index: 2;
+        position: relative;
+    }
+
+
+   

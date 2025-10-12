@@ -1,0 +1,130 @@
+﻿@model PagedList.IPagedList<RoomBooking.Models.BookingMaster>
+@using PagedList.Mvc
+<link href="~/Content/PagedList.css" rel="stylesheet" type="text/css" />
+
+
+@{
+    ViewBag.Title = "Bookings";
+}
+
+<h2>Bookings</h2>
+
+<p>
+    @Html.ActionLink("Create New", "Create", "", new { @class = "btn btn-outline-info" })
+</p>
+@using (Html.BeginForm("Index", "Booking", FormMethod.Get))
+{
+    <p>
+        Find by name: @Html.TextBox("SearchString")
+        <input type="submit" value="Search" class="btn btn-outline-info" />
+    </p>
+}
+<table class="table">
+    <tr>
+        <th style="text-align:center">
+            @Html.ActionLink("Guest Name", "Index", new { SortOrder = ViewBag.NameSortParm })
+        </th>
+        <th style="text-align:center">
+            @*@Html.DisplayNameFor(model => model.Phone)*@
+            Phone
+        </th>
+        <th style="text-align:center">
+            @*@Html.DisplayNameFor(model => model.Email)*@
+            Email
+        </th>
+        <th style="text-align:center"> Guest Image</th>
+        <th style="text-align:center">CheckIn </th>
+        <th style="text-align:center"> CheckOut </th>
+        <th style="text-align:center">Room Image</th>
+        <th style="text-align:center"> Action</th>
+     
+    </tr>
+
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td >
+                @Html.DisplayFor(modelItem => item.GuestName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Phone)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Email)
+            </td>
+            <td>
+                @if (!string.IsNullOrEmpty(item.ImagePath))
+                {
+                    <img src="@Url.Content(item.ImagePath)" width="100" />
+                }
+               
+
+            </td>
+            <td>
+                @if (item.BookingDetails != null && item.BookingDetails.Any())
+                {
+                    <ul>
+                        @foreach (var detail in item.BookingDetails)
+                        {
+                            <li>@detail.CheckInDate.ToString("yyyy-MM-dd")</li>
+                        }
+                    </ul>
+                }
+            </td>
+            <td>
+                @if (item.BookingDetails != null && item.BookingDetails.Any())
+                {
+                    <ul>
+                        @foreach (var detail in item.BookingDetails)
+                        {
+                            <li>@detail.CheckOutDate.ToString("yyyy-MM-dd")</li>
+                        }
+                    </ul>
+                }
+            </td>
+            <td>
+                <ul>
+
+                    @foreach (var book in item.BookingDetails)
+                    {
+                        <li>
+
+                            @if (!string.IsNullOrEmpty(book.Room.ImagePath))
+                            {
+                                <img src="@book.Room.ImagePath" width="100" />
+                            }
+
+                            <p>@book.Room.RoomName</p>
+
+                        </li>
+                    }
+                </ul>
+            </td>
+            <td>
+                <div class="individual-button-container">
+                    <div class="button-wrapper">
+                        @Html.ActionLink("Edit", "Edit", new { id = item.BookingId }, new { @class = "btn-link edit" })
+                    </div>
+                    <div class="button-wrapper">
+                        @Html.ActionLink("Details", "Details", new { id = item.BookingId }, new { @class = "btn-link details" })
+                    </div>
+                    <div class="button-wrapper">
+                        @Html.ActionLink("Delete", "Delete", new { id = item.BookingId }, new { @class = "btn-link delete" })
+                    </div>
+                </div>
+            </td>
+        </tr>
+    }
+
+</table>
+<br />
+Page @(Model.PageCount < Model.PageNumber ? 0 : Model.PageNumber) of
+@Model.PageCount
+@Html.PagedListPager(Model, page => Url.Action("Index",
+new
+{
+    page,
+    sortOrder = ViewBag.CurrentSort,
+    currentFilter =
+ViewBag.CurrentFilter
+})) 

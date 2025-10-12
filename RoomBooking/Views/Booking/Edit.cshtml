@@ -1,0 +1,202 @@
+﻿@model RoomBooking.ViewModel.BookingVM
+
+@{
+    ViewBag.Title = "Edit";
+    if (Request.IsAjaxRequest())
+    {
+        Layout = null;
+    }
+    else
+    {
+        Layout = "~/Views/Shared/_AjaxLayout.cshtml";
+    }
+}
+
+<h2>Edit</h2>
+
+@* 1. FORM FIX: Added enctype="multipart/form-data" for file upload *@
+@using (Html.BeginForm("Edit", "Booking", FormMethod.Post, new { enctype = "multipart/form-data", id = "booking-edit-form" }))
+{
+    @Html.AntiForgeryToken()
+    @Html.HiddenFor(a => a.BookingId)
+
+    <div class="form-horizontal">
+        <h4>BookingMaster</h4>
+        <hr />
+        @Html.ValidationSummary(false, "", new { @class = "text-danger" })
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.GuestName, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.GuestName, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.GuestName, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Phone, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Phone, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Phone, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Email, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Email, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Email, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.BookingDate, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.TextBoxFor(model => model.BookingDate, new
+                {
+                    @class = "form-control",
+                    type = "date",
+                    Value = Model.BookingDate.ToString("yyyy-MM-dd")
+                })
+                @Html.ValidationMessageFor(model => model.BookingDate, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        @* 2. FILE INPUT FIX: Use correct name (GuestImageFile) and preserve ImagePath *@
+        <div class="form-group">
+            @Html.Label("Guest Image", "Guest Image : ", htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+
+                @* This hidden field is CRITICAL to send the existing path back to the controller if a new file isn't selected *@
+                @Html.HiddenFor(model => model.ImagePath)
+
+                <input type="file" name="GuestImageFile" class="form-control" />
+                @Html.ValidationMessage("GuestImageFile", "", new { @class = "text-danger" })
+
+                @* Display current image if one exists *@
+                @if (!string.IsNullOrEmpty(Model.ImagePath))
+                {
+                    <p>Current Image:</p>
+                    <img src="@Url.Content(Model.ImagePath)" width="100" />
+                }
+            </div>
+        </div>
+
+        <div id="booking-details">
+            @Html.Partial("_Data", Model)
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Save" class="btn btn-outline-info" name="actionType" />
+            </div>
+        </div>
+    </div>
+}
+
+<br />
+
+<div>
+    @Html.ActionLink("Back to List", "Index", "", new { @class = "btn btn-outline-info" })
+</div>
+
+@section Scripts {
+    <script>
+        // Existing script for room price
+        $(document).on('change', 'select[name$=".RoomId"]', function () {
+            var select = $(this);
+            var roomId = select.val();
+            var row = select.closest('tr');
+
+            if (roomId > 0) {
+                $.get('/Booking/GetRoomPrice', { id: roomId }, function (data) {
+                    if (data && data.PricePerNight) {
+                        row.find('input[name$=".PricePerNight"]').val(data.PricePerNight);
+                    }
+                });
+            }
+        });
+
+        $(document).ready(function () {
+
+            // 3. FINAL SAVE FIX: Uses FormData
+            $('#booking-edit-form').on('submit', function (e) {
+                e.preventDefault();
+                var form = $(this);
+                var loadingGif = $('#loading');
+                var refreshDiv = $('#refresh');
+
+                loadingGif.show();
+
+                $.ajax({
+                    url: form.attr('action'),
+                    type: form.attr('method'),
+                    data: new FormData(form[0]), //  Uses FormData
+                    processData: false,           // Required for FormData
+                    contentType: false,           // Required for FormData
+                    success: function (result) {
+                        setTimeout(function () {
+                            loadingGif.hide();
+                            // Handle full page refresh after successful edit
+                            window.location.href = '/Booking/Index';
+                        }, 1500);
+                    },
+                    error: function (xhr, status, error) {
+                        console.error('AJAX Error: ', status, error);
+                        loadingGif.hide();
+                    }
+                });
+            });
+
+            // 4. PARTIAL AJAX FIX: Uses FormData
+            function handlePartialAjax(operationValue) {
+                var form = $('#booking-edit-form');
+                var loadingGif = $('#loading');
+
+                loadingGif.show();
+
+                //  Use FormData to include the file input content
+                var formData = new FormData(form[0]);
+
+                // Append the 'operation' value
+                formData.append('operation', operationValue);
+
+                $.ajax({
+                    url: '@Url.Action("Edit", "Booking")',
+                    type: 'POST',
+                    data: formData,           //  Uses FormData
+                    processData: false,       //  Required for FormData
+                    contentType: false,       //  Required for FormData
+                    success: function (result) {
+                        setTimeout(function () {
+                            loadingGif.hide();
+                            $('#booking-details').html(result); // Update only the partial view section
+
+                            // Re-parse validation on new content
+                            if (window.jQuery && window.jQuery.validator && window.jQuery.validator.unobtrusive) {
+                                $.validator.unobtrusive.parse($('#booking-details'));
+                            }
+                        }, 1500);
+                    },
+                    error: function (xhr, status, error) {
+                        console.error('AJAX Error: ', status, error);
+                        loadingGif.hide();
+                    }
+                });
+            }
+
+            // Handle the "Add" button click
+            $(document).on('click', '#add-detail-btn', function (e) {
+                e.preventDefault();
+                handlePartialAjax('add');
+            });
+
+            // Handle the "Delete" button click
+            $(document).on('click', '.delete', function (e) {
+                e.preventDefault();
+                var deleteValue = $(this).val();
+                handlePartialAjax(deleteValue);
+            });
+        });
+    </script>
+}

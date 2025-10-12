@@ -1,0 +1,19 @@
+﻿@{
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+
+<script src="~/Scripts/jquery.unobtrusive-ajax.js"></script>
+
+<div id="refresh">
+    @RenderBody()
+
+
+    <img src="~/Content/images/loading.gif" id="loading"
+         style="display: none; position: absolute; left: 50%; top: 50%; width: 200px; transform: translate(-50%, -50%);" />
+</div>
+@section scripts
+{
+    @RenderSection("scripts", required: false)
+}
+

@@ -1,0 +1,84 @@
+﻿@model IEnumerable<RoomBooking.Models.Room>
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>Index</h2>
+
+<p>
+
+    <div class="button-wrapper">
+        @Html.ActionLink("Create New", "Create", "", new { @class = "btn-link edit" })
+    </div>
+
+</p>
+<table class="table">
+    <tr>
+        <th style="text-align:center">
+            @Html.DisplayNameFor(model => model.RoomName)
+        </th>
+        <th style="text-align:center">
+            @Html.DisplayNameFor(model => model.ImagePath)
+        </th>
+        <th style="text-align:center">
+            @Html.DisplayNameFor(model => model.PricePerNight)
+        </th>
+        <th style="text-align:center">
+            @Html.DisplayNameFor(model => model.Status)
+        </th>
+        <th style="text-align:center"> Action</th>
+
+    </tr>
+
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.RoomName)
+            </td>
+            <td style="text-align:center">
+                @if (!string.IsNullOrEmpty(item.ImagePath))
+                {
+                    <img src="@item.ImagePath" width="100" />
+                }
+            </td>
+            <td style="text-align:center">
+                @Html.DisplayFor(modelItem => item.PricePerNight)
+            </td>
+
+            <td style="text-align:center">
+                @if (item.Status)
+                {
+                    <span class="text-danger">Not Available</span>
+                    <br />
+                    using (Html.BeginForm("Checkout", "Room", new { id = item.RoomId }, FormMethod.Post))
+                    {
+                        @Html.AntiForgeryToken()
+                        <button type="submit" class="btn btn-outline-primary ">Checkout</button>
+                    }
+                }
+                else
+                {
+                    <span class="text-primary">Available</span>
+                }
+            </td>
+
+            <td>
+
+                <div class="individual-button-container">
+                    <div class="button-wrapper">
+                        @Html.ActionLink("Edit", "Edit", new { id = item.RoomId }, new { @class = "btn-link edit" })
+                    </div>
+                    <div class="button-wrapper">
+                        @Html.ActionLink("Details", "Details", new { id = item.RoomId }, new { @class = "btn-link details" })
+                    </div>
+                    <div class="button-wrapper">
+                        @Html.ActionLink("Delete", "Delete", new { id = item.RoomId }, new { @class = "btn-link delete" })
+                    </div>
+                </div>
+            </td>
+        </tr>
+    }
+
+</table>

@@ -1,0 +1,21 @@
+﻿@model RoomBooking.ViewModel.RegisterVM
+
+@using (Html.BeginForm())
+{
+    @Html.AntiForgeryToken()
+    <div>
+        <h2>Register</h2>
+        @Html.ValidationSummary(true)
+
+        <p>@Html.LabelFor(m => m.Username)<br /> @Html.TextBoxFor(m => m.Username, new { @class = "btn btn-outline-info" })</p>
+        <p>@Html.LabelFor(m => m.Password) <br />@Html.PasswordFor(m => m.Password, new { @class = "btn btn-outline-info" })</p>
+        <p>@Html.LabelFor(m => m.ConfirmPassword)<br /> @Html.PasswordFor(m => m.ConfirmPassword, new { @class = "btn btn-outline-info" })</p>
+
+        <button type="submit" class = "btn btn-outline-info">Register</button>
+    </div>
+}
+<br />
+<p>
+    Already have an account?<br />
+    @Html.ActionLink("Login", "Login", "Account", new { @class = "btn btn-outline-info" })
+</p>

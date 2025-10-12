@@ -1,0 +1,175 @@
+﻿@model RoomBooking.ViewModel.BookingVM
+
+@{
+    ViewBag.Title = "Create";
+    if (Request.IsAjaxRequest())
+    {
+        Layout = null;
+    }
+    else
+    {
+        Layout = "~/Views/Shared/_AjaxLayout.cshtml";
+    }
+}
+
+<h2>Create</h2>
+
+@using (Html.BeginForm("Create", "Booking", FormMethod.Post, new { enctype = "multipart/form-data", id = "bookingForm" }))
+
+{
+    @Html.AntiForgeryToken()
+    <div class="form-horizontal">
+        <h4>BookingMaster</h4>
+        <hr />
+        @Html.ValidationSummary(true, "", new { @class = "text-danger" })
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.GuestName, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.GuestName, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.GuestName, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Phone, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Phone, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Phone, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.Email, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.EditorFor(model => model.Email, new { htmlAttributes = new { @class = "form-control" } })
+                @Html.ValidationMessageFor(model => model.Email, "", new { @class = "text-danger" })
+            </div>
+        </div>
+        <div class="form-group">
+            @Html.Label("GuestImageFile", "Guest Image:", htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                <input type="file" name="GuestImageFile" class="form-control" />
+                @Html.ValidationMessage("GuestImageFile", "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+        <div class="form-group">
+            @Html.LabelFor(model => model.BookingDate, htmlAttributes: new { @class = "control-label col-md-2" })
+            <div class="col-md-10">
+                @Html.TextBoxFor(model => model.BookingDate, new
+                {
+                    @class = "form-control",
+                    type = "date",
+                    Value = Model.BookingDate.ToString("yyyy-MM-dd")
+                })
+                @Html.ValidationMessageFor(model => model.BookingDate, "", new { @class = "text-danger" })
+            </div>
+        </div>
+
+
+
+        <div id="data-partial-container">
+            @Html.Partial("_Data", Model)
+        </div>
+
+        <div class="form-group">
+            <div class="col-md-offset-2 col-md-10">
+                <input type="submit" value="Create" class="btn btn-outline-info" />
+            </div>
+        </div>
+    </div>
+}
+<br />
+<div>
+    @Html.ActionLink("Back to List", "Index", "", new { @class = "btn btn-outline-info" })
+</div>
+
+@section Scripts {
+    <script>
+        $(document).on('change', 'select[name$=".RoomId"]', function () {
+            var select = $(this);
+            var roomId = select.val();
+            var row = select.closest('tr');
+
+            if (roomId > 0) {
+                $.get('/Booking/GetRoomPrice', { id: roomId }, function (data) {
+                    if (data && data.PricePerNight) {
+                        row.find('input[name$=".PricePerNight"]').val(data.PricePerNight);
+                    }
+                });
+            }
+        });
+
+        $(document).on('submit', '#bookingForm', function (e) {
+            e.preventDefault();
+            var form = $(this);
+            var loading = $('#loading');
+            var refresh = $('#refresh');
+
+            loading.show();
+
+            $.ajax({
+                url: form.attr('action'),
+                type: form.attr('method'),
+                data: new FormData(form[0]),
+                processData: false,
+                contentType: false,
+                success: function (result) {
+                    setTimeout(function () {
+                        loading.hide();
+                        refresh.html(result);
+                    }, 1500);
+                },
+                error: function (xhr, status, error) {
+                    loading.hide();
+                    console.error("AJAX Error: ", status, error);
+                }
+            });
+        });
+
+        $(document).on('click', '#data-partial-container button[name="operation"]', function (e) {
+            e.preventDefault();
+            var button = $(this);
+            var form = $('#bookingForm');
+            var loading = $('#loading');
+            var partialContainer = $('#data-partial-container');
+
+            loading.show();
+
+            //  Create FormData object from the form to include the file.
+            var formData = new FormData(form[0]);
+
+            // Manually append the button's operation value (e.g., 'operation=add').
+            formData.append(button.attr('name'), button.val());
+
+            $.ajax({
+                url: form.attr('action'),
+                type: form.attr('method'),
+
+                // Use the FormData object for the data parameter
+                data: formData,
+
+                //Required settings for sending files via AJAX
+                processData: false,
+                contentType: false,
+
+                success: function (result) {
+                    setTimeout(function () {
+                        loading.hide();
+                        partialContainer.html(result); // This updates only the partial view container
+
+                        // Re-enable client-side validation on the new elements
+                        if (window.jQuery && window.jQuery.validator && window.jQuery.validator.unobtrusive) {
+                            $.validator.unobtrusive.parse(partialContainer);
+                        }
+                    }, 1500);
+                },
+                error: function (xhr, status, error) {
+                    loading.hide();
+                    console.error("AJAX Error: ", status, error);
+                }
+            });
+        });
+    </script>
+}

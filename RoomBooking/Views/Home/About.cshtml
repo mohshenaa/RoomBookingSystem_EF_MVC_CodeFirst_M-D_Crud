@@ -1,0 +1,28 @@
+﻿@model IEnumerable<RoomBooking.ViewModel.BookingDateGroup>
+@{
+    ViewBag.Title = "Booking Body Statistics";
+}
+
+<h2>Booking Body Statistics</h2>
+<table>
+    <tr>
+        <th>
+            Booking Date
+        </th>
+        <th>
+            Bookings
+        </th>
+    </tr>
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.BookingDate)
+            </td>
+            <td>
+                @item.BookingCount
+            </td>
+        </tr>
+
+    }
+</table> 

@@ -1,0 +1,95 @@
+﻿@model RoomBooking.Models.BookingMaster
+
+@{
+    ViewBag.Title = "Details";
+}
+
+<h2>Details</h2>
+
+<div>
+    <h4>BookingMaster</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.GuestName)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.GuestName)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Phone)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Phone)
+        </dd>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Email)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.Email)
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.ImagePath)
+        </dt>
+
+        <dd>
+            @if (!string.IsNullOrEmpty(Model.ImagePath))
+            {
+                <img src="@Url.Content(Model.ImagePath)" width="100" />
+            }
+            else
+            {
+                <span>No image</span>
+            }
+
+        </dd>
+        <dt>
+            @Html.DisplayNameFor(model => model.BookingDate)
+        </dt>
+
+        <dd>
+            @Html.DisplayFor(model => model.BookingDate)
+        </dd>
+
+    </dl>
+    <hr />
+
+    <ol>
+
+
+        @foreach (var item in Model.BookingDetails)
+        {
+            <li>
+               <h5> @item.Room.RoomName</h5>
+                <br />
+                PerNightCost= <span class="text-danger-emphasis"> @item.PricePerNight.ToString("n0")</span>
+                <br />
+                StayingDays= @item.StayingDays
+                <br />
+                Bill=@item.Bill
+
+                @if (!string.IsNullOrEmpty(item.Room.ImagePath))
+                {
+                    <figure class="figure-img">
+                        <img src="@item.Room.ImagePath" width="200" class="img-fluid" />                     
+                    </figure>
+                }
+                <hr />
+            </li>
+        }
+       
+    </ol>
+
+</div>
+<p>
+    @Html.ActionLink("Edit", "Edit", new { id = Model.BookingId }, new { @class = "btn btn-outline-info " }) 
+    <br />
+    <div>
+        @Html.ActionLink("Back to List", "Index", "", new { @class = "btn btn-outline-info" })
+    </div>
+</p>
